@@ -1,1 +1,10 @@
 .env
+
+# Foundry
+out/
+cache/
+
+# Node
+server/node_modules/
+server/.env
+server/oracle.db

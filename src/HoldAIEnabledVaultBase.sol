@@ -50,14 +50,15 @@ abstract contract HoldAIEnabledVaultBase is VaultBaseV2, IVaultCallback {
         
         // 子合约需要提供自己当前的链上状态和支持的动作集合
         string memory currentState = _buildStateString();
-        string memory actions = _buildActionSet();
+        string[] memory actions = _buildActionSet();
 
         // 携带 value 调用 provider
         lastRequestId = holdAiProvider.reason{value: fee}(
             aiModel,
             currentPrompt,
             currentState,
-            actions
+            actions,
+            200000
         );
         
         emit AiRequestSent(lastRequestId, aiModel, fee);
@@ -97,7 +98,7 @@ abstract contract HoldAIEnabledVaultBase is VaultBaseV2, IVaultCallback {
     /**
      * @dev 定义这个 Vault 能执行的操作枚举 (如 "noop, buy_back, burn")
      */
-    function _buildActionSet() internal view virtual returns (string memory);
+    function _buildActionSet() internal view virtual returns (string[] memory);
 
     /**
      * @dev 根据大模型选择的指令，执行真实的链上状态改变
