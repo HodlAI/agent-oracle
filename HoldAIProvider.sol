@@ -25,7 +25,8 @@ contract HoldAIProvider is Ownable, ReentrancyGuard {
     struct Request {
         address requester;      // 请求者 (即对应的 Vault 合约)
         string model;           // 选用的 AI 模型
-        bool isFulfilled;       // 状态
+        bool isFulfilled;
+        uint32 callbackGasLimit;       // 状态
     }
     
     // 保存请求状态以防重复或欺诈
@@ -39,7 +40,7 @@ contract HoldAIProvider is Ownable, ReentrancyGuard {
         string model,
         string systemPrompt,
         string stateString,
-        string actionSet
+        string[] actionSet
     );
     
     // 预言机节点完结交易
@@ -71,7 +72,8 @@ contract HoldAIProvider is Ownable, ReentrancyGuard {
         string calldata model,
         string calldata systemPrompt,
         string calldata stateString,
-        string calldata actionSet
+        string[] calldata actionSet,
+        uint32 callbackGasLimit
     ) external payable nonReentrant returns (uint256 requestId) {
         uint256 fee = modelFees[model];
         if (fee == 0) revert InvalidModel(model);
@@ -83,6 +85,7 @@ contract HoldAIProvider is Ownable, ReentrancyGuard {
 
         requestId = ++_requestCounter;
         requests[requestId] = Request({
+            callbackGasLimit: callbackGasLimit,
             requester: msg.sender,
             model: model,
             isFulfilled: false
@@ -114,7 +117,7 @@ contract HoldAIProvider is Ownable, ReentrancyGuard {
         req.isFulfilled = true;
         
         // 安全调用请求者的回调函数
-        try IVaultCallback(req.requester).fulfillReason(requestId, resultAction, reasoningIpfsCid) {
+        try IVaultCallback(req.requester).fulfillReason{gas: req.callbackGasLimit}(requestId, resultAction, reasoningIpfsCid) {
             emit ReasoningFulfilled(requestId, req.requester, resultAction, reasoningIpfsCid);
         } catch {
             // 如果对方池子逻辑崩了我们也不 revert，记为回调失败日志
