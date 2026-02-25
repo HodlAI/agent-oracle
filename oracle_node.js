@@ -124,7 +124,7 @@ Do NOT output anything other than the chosen action string. Do NOT output markdo
     try {
         // Enforce HodlAI API format
         const payload = {
-            model: row.model || "hodlai/gemini-3.1-pro-preview", // 强制默认使用 Gemini 3.1 Pro 
+            model: row.model || "gemini-3.1-pro-preview", // 强制默认使用 Gemini 3.1 Pro 
             messages: [{ role: "system", content: "You are a purely deterministic rule engine responding to a smart contract. You MUST output EXACTLY ONE text value from the following explicitly permitted `actionSet`. Do NOT add Markdown formatting, explanations, or any other characters." }, { role: "user", content: prompt }],
             temperature: 0.01,
             max_tokens: 50
