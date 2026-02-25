@@ -121,6 +121,16 @@ abstract contract HoldAIEnabledVaultBase is VaultBaseV2 {
     /**
      * @dev Oracle node calls this to fulfill the reasoning request.
      * Only the authorized Oracle Provider can call this.
+     *
+     * IMPORTANT GAS LIMIT:
+     * The HodlAI Oracle Node will execute this callback with a strict gas limit 
+     * (e.g., maximum 1,000,000 gas). Vault developers MUST ensure that their 
+     * implementation of `fulfillReason` is highly optimized. Any execution 
+     * exceeding this limit will revert the Oracle's transaction, dropping the callback.
+     *
+     * @param requestId The unique ID of the original request.
+     * @param resultAction The strictly constrained string chosen by the AI (from `actionSet`).
+     * @param reasoningIpfsCid (Optional) The IPFS CID containing the AI's full reasoning trace.
      */
     function fulfillReason(
         uint256 requestId, 
