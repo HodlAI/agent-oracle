@@ -173,7 +173,8 @@ Node.js 后端作为链下预言机桥梁，负责抓取 BSC 链上事件并对�
      Do NOT add Markdown formatting, explanations, or any other characters.
      Permitted Action Set: [${actionSet.join(', ')}]
      ```
-   - **[TODO] 内部基础设施对齐**: AI 大脑层面的底层对接（如何优雅组装 Headers，如何调用 HodlAI Router Proxy 如 API 金库 `https://api.hodlai.fun` / OpenRouter 中转）目前在代码侧处于 **`Stub`** 状态。需留下纯净的 Interface 接口 `execute_holdai_inference()`，等待后期由 **Mine** 主导去把业务实现逻辑接入现有基建。
+   - **API 端点**: 确保底层的 `API_BASE` 请求发往私有的 `https://api.hodlai.fun/v1/chat/completions`。
+   - **默认模型映射**: 对于智能合约发起的可选参数缺省或者是未指定的情况，**强制回落 (Fallback)** 到旗舰级模型 `hodlai/gemini-3.1-pro-preview`，兼顾响应速度与严密的逻辑遵循标准（防止乱格式输出）。
    - **发交易与状态流转**: AI 结束思考并命中正确指令后，立刻组装调用 `IHoldAIProvider.fulfillNodeReasoning` 的链上交易。交易广播成功发送后，立即将本地数据库中该记录的状态变更为 `PROCESSED`。
 
 
