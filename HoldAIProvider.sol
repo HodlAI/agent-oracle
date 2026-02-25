@@ -29,6 +29,8 @@ contract HoldAIProvider is Ownable, ReentrancyGuard {
         uint32 callbackGasLimit;       // 状态
     }
     
+    uint32 public maxCallbackGasLimit = 500000;
+
     // 保存请求状态以防重复或欺诈
     mapping(uint256 => Request) public requests;
 
@@ -77,6 +79,7 @@ contract HoldAIProvider is Ownable, ReentrancyGuard {
     ) external payable nonReentrant returns (uint256 requestId) {
         uint256 fee = modelFees[model];
         if (fee == 0) revert InvalidModel(model);
+        require(callbackGasLimit <= maxCallbackGasLimit, "Gas limit too high");
         if (msg.value < fee) revert InsufficientFee(fee, msg.value);
 
         // 抽水逻辑：立刻将赚取的 BNB 打入大金库 (Treasury)
@@ -128,6 +131,10 @@ contract HoldAIProvider is Ownable, ReentrancyGuard {
     // ---------------------------------------------------------
     // 管理员设置
     // ---------------------------------------------------------
+    function setMaxCallbackGasLimit(uint32 _maxGasLimit) external onlyOwner {
+        maxCallbackGasLimit = _maxGasLimit;
+    }
+
     function setModelFee(string calldata model, uint256 fee) external onlyOwner {
         modelFees[model] = fee;
     }
