@@ -4,3 +4,4 @@ out = "out"
 libs = ["lib"]
 test = "test"
 script = "script"
+remappings = ["@openzeppelin/=lib/openzeppelin-contracts/"]
